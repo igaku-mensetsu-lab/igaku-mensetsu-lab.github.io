@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>医学部面接ラボ</title>
+<meta name="description" content="現役の慶應医学部生と、本番と同じ形式で60分の模擬面接。その場でやり直し練習をして、終わったら評価シートをお送りします。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@600;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 面接室の「受験票」と「評価シート」を下敷きにした1カラム。紙の白・インクの紺・LINEの緑だけで構成 */
+:root{
+  --paper:#f7f8fa; --card:#ffffff; --ink:#16233a; --sub:#56627a; --rule:#d8dee8;
+  --navy:#1f3a5f; --navy-ink:#ffffff; --accent:#2f6fb0; --tint:#e9eff7;
+  --line:#06c755; --line-ink:#ffffff; --mark:#c2410c;
+  --display:"Zen Old Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f1623; --card:#16202f; --ink:#e7ecf4; --sub:#a3afc2; --rule:#2a3648;
+  --navy:#1b2c45; --navy-ink:#eef3fa; --accent:#7fb0e6; --tint:#1c2a3e;
+  --line:#06c755; --line-ink:#ffffff; --mark:#fb923c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f1623; --card:#16202f; --ink:#e7ecf4; --sub:#a3afc2; --rule:#2a3648;
+  --navy:#1b2c45; --navy-ink:#eef3fa; --accent:#7fb0e6; --tint:#1c2a3e;
+  --line:#06c755; --line-ink:#ffffff; --mark:#fb923c; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased;padding-bottom:84px}
+a{color:var(--accent)}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.35;margin:0}
+p{margin:0}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.narrow{max-width:720px}
+section{padding-block:72px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+.sec-head{display:grid;gap:10px;margin-bottom:32px}
+.sec-head h2{font-size:clamp(24px,4.2vw,34px)}
+.sec-head p{color:var(--sub)}
+
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--navy);color:var(--navy-ink)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px}
+.logo{font-family:var(--display);font-weight:900;font-size:18px;letter-spacing:.04em;color:var(--navy-ink);text-decoration:none;display:flex;align-items:center;gap:10px;line-height:1.3}
+.mark{width:40px;height:40px;flex:none;border-radius:50%;border:2px solid #8fc8ff;display:grid;place-items:center;position:relative}
+.mark::before{content:"";position:absolute;inset:3px;border:1.5px solid #fff;border-radius:50%}
+.mark span{writing-mode:vertical-rl;font-family:var(--display);font-weight:900;font-size:11px;letter-spacing:0;color:#fff;line-height:1}
+.logo small{display:block;font-family:var(--body);font-weight:500;font-size:11px;opacity:.75;letter-spacing:.02em}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;font-weight:700;text-decoration:none;font-family:var(--body);transition:transform .15s ease,box-shadow .15s ease}
+.btn:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.btn-line{background:var(--line);color:var(--line-ink);padding:16px 28px;font-size:17px;box-shadow:0 6px 18px rgba(6,199,85,.28)}
+.btn-line:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(6,199,85,.34)}
+.btn-line.sm{padding:8px 16px;font-size:14px;box-shadow:none}
+.btn-ghost{border:1.5px solid currentColor;padding:14px 24px;font-size:15px;color:var(--ink)}
+.line-ico{width:22px;height:22px;flex:none}
+.btn-line.sm .line-ico{width:18px;height:18px}
+
+.hero{background:var(--navy);color:var(--navy-ink);padding-block:56px 64px;position:relative;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
+.hero .eyebrow{color:#9cc3ee}
+.hero h1{font-size:clamp(34px,6.4vw,58px);font-weight:900;margin:14px 0 18px;letter-spacing:.01em}
+.hero h1 em{font-style:normal;background:linear-gradient(transparent 62%,rgba(156,195,238,.35) 62%)}
+.hero .lead{font-size:17px;opacity:.92;max-width:30em}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;align-items:center}
+.hero .btn-ghost{color:var(--navy-ink)}
+.hero .note{font-size:13px;opacity:.75;margin-top:12px}
+
+.ticket{background:#fff;color:#16233a;border-radius:6px;padding:22px 22px 18px;box-shadow:0 18px 40px rgba(0,0,0,.28);font-size:14px;position:relative;transform:rotate(1.2deg)}
+.ticket::before{content:"";position:absolute;inset:8px;border:1px solid #c9d2df;border-radius:3px;pointer-events:none}
+.ticket h3{font-size:15px;letter-spacing:.3em;text-align:center;border-bottom:1px solid #c9d2df;padding-bottom:8px;margin-bottom:10px}
+.ticket dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0}
+.ticket dt{color:#56627a;font-size:12px}
+.ticket dd{margin:0;font-weight:700}
+.ticket .price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ticket s{color:#8a94a6;font-weight:500}
+.ticket .now{font-family:var(--mono);font-size:22px;color:#c2410c}
+.stamp{position:absolute;right:16px;bottom:14px;width:74px;height:74px;border:2.5px solid #c2410c;border-radius:50%;color:#c2410c;display:grid;place-items:center;text-align:center;font-family:var(--display);font-weight:900;font-size:13px;line-height:1.25;transform:rotate(-14deg);opacity:.9}
+
+.worries{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.worry{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:18px 20px;display:flex;gap:12px;align-items:flex-start}
+.worry .q{font-family:var(--display);font-weight:900;color:var(--mark);font-size:20px;line-height:1.2}
+.answer{margin-top:28px;background:var(--tint);border-radius:10px;padding:22px 24px;font-size:17px}
+.answer b{color:var(--accent)}
+
+.timebar{display:flex;border-radius:8px;overflow:hidden;margin-bottom:22px;height:40px;font-family:var(--mono);font-size:12px}
+.timebar span{display:flex;align-items:center;justify-content:center;color:#fff;white-space:nowrap;min-width:0;overflow:hidden}
+.tb1{flex:10;background:#5b7aa3}.tb2{flex:25;background:var(--navy)}.tb3{flex:20;background:var(--accent)}.tb4{flex:5;background:#8aa5c8}
+.steps{display:grid;gap:0;border-top:1px solid var(--rule)}
+.step{display:grid;grid-template-columns:96px minmax(0,1fr);gap:18px;padding:18px 0;border-bottom:1px solid var(--rule)}
+.step .min{font-family:var(--mono);color:var(--accent);font-size:14px;padding-top:3px}
+.step h3{font-size:19px;margin-bottom:4px}
+.step p{color:var(--sub)}
+
+.sheet{background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:24px;box-shadow:0 2px 0 var(--rule)}
+.sheet-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:6px;font-family:var(--display);font-weight:700}
+.sheet-head span{font-family:var(--mono);font-size:12px;color:var(--sub);font-weight:500}
+.sheet table{width:100%;border-collapse:collapse;font-size:14px}
+.sheet th,.sheet td{border-bottom:1px solid var(--rule);padding:10px 8px;text-align:left;vertical-align:top}
+.sheet th{font-size:12px;color:var(--sub);font-weight:500}
+.dots{font-family:var(--mono);letter-spacing:.15em;color:var(--accent);white-space:nowrap}
+.sheet .sample{color:var(--sub)}
+.tbl-scroll{overflow-x:auto}
+.sheet-foot{margin-top:14px;font-size:13px;color:var(--sub)}
+
+.dives{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.dive{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:18px}
+.dive .said{font-size:13px;color:var(--sub)}
+.dive .asked{font-family:var(--display);font-weight:700;font-size:17px;margin-top:6px}
+.dive .asked::before{content:"面接官　";font-family:var(--mono);font-size:11px;color:var(--mark);display:block;letter-spacing:.1em}
+.schools{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.schools span{border:1px solid var(--rule);background:var(--card);border-radius:999px;padding:4px 12px;font-size:13px}
+.update{margin-top:18px;border-left:3px solid var(--accent);background:var(--tint);padding:12px 16px;border-radius:0 8px 8px 0;font-size:14px}
+
+.profile{display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;align-items:start}
+.badge-card{background:var(--navy);color:var(--navy-ink);border-radius:10px;padding:22px;text-align:center}
+.badge-card .big{font-family:var(--display);font-weight:900;font-size:26px;line-height:1.3}
+.badge-card small{opacity:.8;font-size:12px}
+.facts{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
+.facts li{padding-left:22px;position:relative}
+.facts li::before{content:"";position:absolute;left:0;top:.75em;width:10px;height:2px;background:var(--accent)}
+
+.price-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.plan{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:26px}
+.plan.hot{border:2px solid var(--mark);position:relative}
+.plan .tag{position:absolute;top:-13px;left:20px;background:var(--mark);color:#fff;font-size:12px;font-weight:700;padding:2px 12px;border-radius:999px}
+.plan h3{font-size:18px}
+.plan .yen{font-family:var(--mono);font-size:40px;line-height:1.2;margin:10px 0 2px}
+.plan .yen small{font-family:var(--body);font-size:15px}
+.plan ul{margin:12px 0 0;padding-left:1.2em;color:var(--sub);font-size:14px}
+.pay-note{margin-top:16px;font-size:14px;color:var(--sub)}
+
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;counter-reset:f;padding:0;margin:0}
+.flow li{list-style:none;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:16px 14px;font-size:14px;counter-increment:f}
+.flow li::before{content:counter(f);font-family:var(--mono);color:var(--accent);display:block;font-size:13px}
+.flow b{display:block;font-size:15px;margin-bottom:2px}
+
+details{border-bottom:1px solid var(--rule);padding:16px 0}
+details:first-of-type{border-top:1px solid var(--rule)}
+summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"＋";color:var(--accent);flex:none}
+details[open] summary::after{content:"−"}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+details p{margin-top:10px;color:var(--sub)}
+
+.final{background:var(--navy);color:var(--navy-ink);text-align:center}
+.final h2{font-size:clamp(26px,4.6vw,38px)}
+.final p{opacity:.9;margin:14px auto 26px;max-width:32em}
+.gift{display:inline-flex;gap:10px;align-items:center;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 14px;font-size:14px;margin-bottom:20px}
+
+.legal{padding-block:40px;font-size:13px;color:var(--sub)}
+.legal h2{font-family:var(--body);font-size:14px;margin-bottom:10px;color:var(--ink)}
+.legal dl{display:grid;grid-template-columns:9em minmax(0,1fr);gap:6px 14px;margin:0}
+.legal dd{margin:0}
+footer{padding-block:24px 8px;font-size:12px;color:var(--sub);text-align:center}
+
+.sticky{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--rule);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sticky .in{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sticky .msg{font-size:13px;line-height:1.5;min-width:0}
+.sticky .msg b{color:var(--mark)}
+.sticky .btn-line{padding:12px 20px;font-size:15px;flex:none}
+
+@media (max-width:760px){
+  section{padding-block:56px}
+  .hero .wrap{grid-template-columns:1fr}
+  .ticket{transform:none;max-width:420px}
+  .worries,.dives,.price-wrap{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr}
+  .profile{grid-template-columns:1fr}
+  .step{grid-template-columns:72px minmax(0,1fr);gap:12px}
+  .timebar{font-size:10px}
+  .top .btn-line.sm span.t{display:none}
+  .legal dl{grid-template-columns:1fr}
+  .legal dt{font-weight:700;color:var(--ink);margin-top:6px}
+}
+</style>
+<meta property="og:title" content="医学部面接ラボ｜現役慶應医学部生の模擬面接">
+<meta property="og:description" content="現役の慶應医学部生と、本番と同じ形式で60分の模擬面接。終わったら評価シートをお送りします。">
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-line" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3C6.48 3 2 6.6 2 11.04c0 3.98 3.55 7.31 8.35 7.94.33.07.77.22.88.5.1.25.07.65.03.9l-.14.85c-.04.25-.2.98.86.54 1.06-.45 5.7-3.36 7.78-5.75C21.2 14.45 22 12.84 22 11.04 22 6.6 17.52 3 12 3Zm-3.6 10.4H6.43a.52.52 0 0 1-.52-.52V8.94a.52.52 0 0 1 1.04 0v3.42H8.4a.52.52 0 0 1 0 1.04Zm2.04-.52a.52.52 0 0 1-1.04 0V8.94a.52.52 0 0 1 1.04 0v3.94Zm4.74 0a.52.52 0 0 1-.94.31l-2.02-2.75v2.44a.52.52 0 0 1-1.04 0V8.94a.52.52 0 0 1 .94-.31l2.02 2.75V8.94a.52.52 0 0 1 1.04 0v3.94Zm3.18-2.49a.52.52 0 0 1 0 1.04H16.9v.93h1.46a.52.52 0 0 1 0 1.04h-1.98a.52.52 0 0 1-.52-.52V8.94c0-.29.23-.52.52-.52h1.98a.52.52 0 0 1 0 1.04H16.9v.93h1.46Z"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="mark" aria-hidden="true"><span>医面</span></span><span>医学部面接ラボ<small>現役医学部生の模擬面接</small></span></a>
+    <a class="btn btn-line sm" href="https://lin.ee/Uvhs20w" target="_blank" rel="noopener"><svg class="line-ico"><use href="#ico-line"/></svg><span class="t">LINEで相談</span></a>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Mock interview · 60 min · Online</div>
+      <h1>現役慶應医学部生と、<br><em>本番の面接</em>を。</h1>
+      <p class="lead">医学部の面接は、答えた内容をその場で深掘りされます。本番と同じ形式で60分練習し、つまずいた答えはその場でやり直し。終わったら評価シートをお送りします。</p>
+      <div class="ctas">
+        <a class="btn btn-line" href="https://lin.ee/Uvhs20w" target="_blank" rel="noopener"><svg class="line-ico"><use href="#ico-line"/></svg>LINEで「定番15問」を受け取る</a>
+        <a class="btn btn-ghost" href="#price">料金を見る</a>
+      </div>
+      <p class="note">友だち追加で、医学部面接の定番15問（PDF）を無料でお送りします。</p>
+    </div>
+    <div class="ticket" aria-label="模擬面接の概要">
+      <h3>模 擬 面 接 票</h3>
+      <dl>
+        <dt>形式</dt><dd>個人面接（Google Meet）</dd>
+        <dt>時間</dt><dd>60分</dd>
+        <dt>面接官</dt><dd>慶應義塾大学医学部 在学生</dd>
+        <dt>受験後</dt><dd>評価シートをお渡し</dd>
+        <dt>日程</dt><dd>早朝・深夜も相談可</dd>
+        <dt>料金</dt><dd class="price"><s>5,000円</s><span class="now">2,500円</span></dd>
+      </dl>
+      <div class="stamp">モニター<br>先着3名</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <div class="sec-head">
+      <div class="eyebrow">For students &amp; parents</div>
+      <h2>こんな不安はありませんか</h2>
+    </div>
+    <div class="worries">
+      <div class="worry"><span class="q">Q</span><p>志望理由を書いたけれど、口に出すと浅く聞こえる</p></div>
+      <div class="worry"><span class="q">Q</span><p>「それはなぜ？」と深掘りされると、言葉に詰まる</p></div>
+      <div class="worry"><span class="q">Q</span><p>学校や家族とは練習しづらく、本番の空気がわからない</p></div>
+      <div class="worry"><span class="q">Q</span><p>塾の面接対策は高く、直前は日程も合わない</p></div>
+    </div>
+    <p class="answer">医学部面接ラボは、<b>数年前に同じ面接を受けた医学部生</b>が面接官役をつとめる練習の場です。志望大学で実際に聞かれた質問をもとに、本番に近い形で練習できます。</p>
+  </div>
+</section>
+
+<section style="background:var(--card);border-block:1px solid var(--rule)">
+  <div class="wrap narrow">
+    <div class="sec-head">
+      <div class="eyebrow">60 minutes</div>
+      <h2>60分の流れ</h2>
+      <p>本番形式の練習と、その場でのやり直しを1回の中で行います。</p>
+    </div>
+    <div class="timebar" aria-hidden="true">
+      <span class="tb1">確認</span><span class="tb2">本番形式の面接</span><span class="tb3">フィードバック</span><span class="tb4"></span>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="min">0–10分</div><div><h3>事前確認</h3><p>事前アンケートをもとに、志望大学・面接の形式・不安な点を確認します。</p></div></div>
+      <div class="step"><div class="min">10–35分</div><div><h3>本番形式の面接</h3><p>入室から志望動機、深掘り、医療の時事まで、志望大学の形式に合わせて通しで行います。</p></div></div>
+      <div class="step"><div class="min">35–55分</div><div><h3>フィードバックとやり直し</h3><p>詰まった答えを一緒に組み立て直し、もう一度答えてもらいます。直した答えをその場で言えるようにします。</p></div></div>
+      <div class="step"><div class="min">55–60分</div><div><h3>まとめ</h3><p>次の練習までにやることを3つ決めます。評価シートは後日LINEでお送りします。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <div class="sec-head">
+      <div class="eyebrow">Evaluation sheet</div>
+      <h2>終わったら、評価シートをお渡しします</h2>
+      <p>5つの観点で採点し、良かったところと直すところを書いてお送りします。保護者の方とも共有できます。</p>
+    </div>
+    <div class="sheet">
+      <div class="sheet-head">模擬面接 評価シート<span>記入例</span></div>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>観点</th><th>評価</th><th>良かったところ／直すところ</th></tr></thead>
+        <tbody>
+          <tr><td>志望動機の具体性</td><td class="dots">●●●○○</td><td class="sample">きっかけの出来事は伝わる。そこから何を考えたかを一言足す</td></tr>
+          <tr><td>深掘りへの対応</td><td class="dots">●●○○○</td><td class="sample">「なぜ本学か」の二段目で詰まった。大学の特色と自分の経験をつなげる</td></tr>
+          <tr><td>医療・時事の理解</td><td class="dots">●●●●○</td><td class="sample">働き方改革の現状は正確。自分の意見をもう少しはっきり</td></tr>
+          <tr><td>話し方・態度</td><td class="dots">●●●●○</td><td class="sample">落ち着いている。結論から話すとさらに良い</td></tr>
+          <tr><td>答えの一貫性</td><td class="dots">●●●○○</td><td class="sample">志望動機と将来像のつながりを整理する</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="sheet-foot">このほか「一番良かった答え」「一番直したい答え」「次までにやること3つ」「志望大学向けのアドバイス」を記入します。</p>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--card);border-block:1px solid var(--rule)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Real questions</div>
+      <h2>先輩たちが本番で聞かれた「深掘り」</h2>
+      <p>医学部の面接官は、話した内容をその場で掘り下げてきます。実際の受験経験者から集めた例です。</p>
+    </div>
+    <div class="dives">
+      <div class="dive"><div class="said">「地方の医療に興味がある」と話したら</div><div class="asked">でも君は都内に住んでいるよね。なぜ地方なの？</div></div>
+      <div class="dive"><div class="said">「読書が好き」と話したら</div><div class="asked">好きな作家はいますか</div></div>
+      <div class="dive"><div class="said">「英語を頑張ってきた」と話したら</div><div class="asked">30年後のあなたは、どこで活躍していると思いますか</div></div>
+    </div>
+    <div class="schools" aria-label="面接情報がある大学">
+      <span>慶應義塾大学</span><span>東京大学（理三）</span><span>京都大学</span><span>日本医科大学</span><span>順天堂大学</span><span>横浜市立大学</span><span>千葉大学</span><span>国際医療福祉大学</span>
+    </div>
+    <p style="margin-top:10px;font-size:13px;color:var(--sub)">上の大学は、受験経験者から面接の情報を集めています。全国82大学の面接資料もあり、どの大学にも対応します。</p>
+    <p class="update"><b>2027年度入試の変更にも対応：</b>東京医科大は一般選抜の2次試験がMMI（状況を示されて考えを答える形式）に変わります。MMI形式の練習も行えます。</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <div class="sec-head">
+      <div class="eyebrow">Interviewer</div>
+      <h2>面接官について</h2>
+    </div>
+    <div class="profile">
+      <div class="badge-card"><div class="big">慶應義塾大学<br>医学部 3年</div><small>藁谷 蓮</small></div>
+      <div>
+        <p>一般入試で医学部6校に合格。受験の記憶が新しい現役医学部生が、何が聞かれ、どこで詰まりやすいかをそのまま伝えます。</p>
+        <ul class="facts">
+          <li>医学部6校に合格（慶應・慈恵・順天堂・日本医大・横浜市大・防衛医大）</li>
+          <li>家庭教師として、さまざまな生徒を指導。指導した生徒が聖光学院に合格</li>
+          <li>医学部ゴルフ部（2026年）東医体・秋大会・全医体で団体優勝</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="price" style="background:var(--card);border-block:1px solid var(--rule)">
+  <div class="wrap narrow">
+    <div class="sec-head">
+      <div class="eyebrow">Price</div>
+      <h2>料金</h2>
+      <p>入会金や教材費はかかりません。1回ずつのお申し込みです。</p>
+    </div>
+    <div class="price-wrap">
+      <div class="plan hot">
+        <span class="tag">先着3名</span>
+        <h3>モニター価格</h3>
+        <div class="yen">2,500<small>円</small></div>
+        <ul>
+          <li>60分の模擬面接＋評価シート</li>
+          <li>受講後に感想フォームへのご回答をお願いします</li>
+          <li>いただいた感想は「モニター価格で受講した方の感想」として掲載することがあります</li>
+        </ul>
+      </div>
+      <div class="plan">
+        <h3>通常価格</h3>
+        <div class="yen">5,000<small>円</small></div>
+        <ul>
+          <li>60分の模擬面接＋評価シート</li>
+          <li>志望大学に合わせた質問で実施</li>
+          <li>早朝・深夜の時間帯もご相談ください</li>
+        </ul>
+      </div>
+    </div>
+    <p class="pay-note">お支払いは銀行振込（前払い）です。振込先は予約確定後にLINEでお知らせします。</p>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">How to book</div>
+      <h2>お申し込みの流れ</h2>
+    </div>
+    <ol class="flow">
+      <li><b>LINEで友だち追加</b>定番15問のPDFが届きます</li>
+      <li><b>日時を予約</b>メニューの「予約する」から空き枠を選びます</li>
+      <li><b>事前アンケート</b>志望大学や不安な点を記入します</li>
+      <li><b>お振込み</b>振込先はLINEでお知らせします</li>
+      <li><b>模擬面接</b>Google Meetで60分。後日評価シート</li>
+    </ol>
+  </div>
+</section>
+
+<section style="background:var(--card);border-block:1px solid var(--rule)">
+  <div class="wrap narrow">
+    <div class="sec-head">
+      <div class="eyebrow" id="faq">FAQ</div>
+      <h2>よくある質問</h2>
+    </div>
+    <details><summary>慶應以外の大学を受けるのですが、大丈夫ですか</summary><p>はい、どの大学でも対応できます。東大・京大・日本医大・順天堂・横浜市大・千葉大・国際医療福祉大などは、受験経験者から集めた面接の情報があります。そのほかの大学も、全国82大学の面接資料をもとに、形式とよく聞かれる質問を合わせて行います。</p></details>
+    <details><summary>保護者が申し込んだり、同席したりできますか</summary><p>どちらも可能です。お申し込みは保護者の方からでも構いません。当日は同じ部屋で見ていただいても大丈夫です。</p></details>
+    <details><summary>どんな準備をすればいいですか</summary><p>志望理由書や調査書の内容など、本番で話す予定のことを手元に用意してください。事前アンケートの内容をもとに質問を考えます。</p></details>
+    <details><summary>早朝や夜遅くでも受けられますか</summary><p>予約ページにない時間帯でも、LINEでご相談いただければ調整します。</p></details>
+    <details><summary>日程を変更したいときは</summary><p>前日までにLINEでご連絡ください。日程変更も全額返金も可能です。</p></details>
+    <details><summary>集団面接やMMIの練習はできますか</summary><p>MMI形式の質問（状況を示されて考えを答える問題）は、個人面接の練習の中で行えます。集団討論は現在準備中です。</p></details>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap narrow">
+    <div class="gift">友だち追加の特典　医学部面接の定番15問（PDF）</div>
+    <h2>本番の前に、一度、本番を。</h2>
+    <p>まずはLINEで友だち追加してください。質問や日程のご相談も、LINEで受け付けています。</p>
+    <a class="btn btn-line" href="https://lin.ee/Uvhs20w" target="_blank" rel="noopener"><svg class="line-ico"><use href="#ico-line"/></svg>LINEで友だち追加する</a>
+  </div>
+</section>
+
+<section class="legal">
+  <div class="wrap narrow">
+    <h2>特定商取引法に基づく表記</h2>
+    <dl>
+      <dt>販売事業者</dt><dd>医学部面接ラボ（運営責任者：藁谷 蓮）</dd>
+      <dt>所在地・電話番号</dt><dd>請求があった場合、遅滞なく開示します</dd>
+      <dt>お問い合わせ</dt><dd>公式LINE（@045fichh）</dd>
+      <dt>販売価格</dt><dd>模擬面接60分 5,000円（税込）。モニター価格 2,500円（先着3名）</dd>
+      <dt>支払方法・時期</dt><dd>銀行振込。予約確定後、実施日の前日までにお支払いください</dd>
+      <dt>提供時期</dt><dd>予約された日時にオンラインで実施します</dd>
+      <dt>日程変更・キャンセル</dt><dd>前日までのご連絡なら、日程変更も全額返金も可能です（当日のキャンセルのみ、返金はできません）</dd>
+    </dl>
+  </div>
+</section>
+</main>
+
+<footer>© 2026 医学部面接ラボ</footer>
+
+<div class="sticky" role="region" aria-label="お申し込み">
+  <div class="in">
+    <p class="msg">60分の模擬面接　<b>モニター先着3名 2,500円</b></p>
+    <a class="btn btn-line" href="https://lin.ee/Uvhs20w" target="_blank" rel="noopener"><svg class="line-ico"><use href="#ico-line"/></svg>友だち追加</a>
+  </div>
+</div>
+
+</body>
+</html>
